@@ -1,0 +1,38 @@
+name: Build Movix APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v6
+
+      - name: Installer Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Installer Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.2.1'
+
+      - name: Décompresser le projet
+        run: |
+          mkdir project
+          unzip -q MovixAndroid5_GitHub_APK.zip -d project
+
+      - name: Construire l'APK
+        working-directory: project/MovixAndroid5
+        run: gradle assembleDebug --no-daemon
+
+      - name: Récupérer l'APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Movix-Android5-APK
+          path: project/MovixAndroid5/app/build/outputs/apk/debug/app-debug.apk
